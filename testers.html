@@ -1,0 +1,213 @@
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi" />
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="format-detection" content="telephone=no">
+    <meta http-equiv="cleartype" content="on">
+    <title>Numpad</title>
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Tangerine"><link href='https://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+    <script type="text/javascript" src="https://devcode.name/numpad/quo.js"></script>
+    <style>
+        .numeric-keypad,
+        .numeric-keypad__key,
+        .numeric-keypad__button {
+            -webkit-box-sizing: border-box;
+            box-sizing: border-box;
+        }
+
+        .numeric-keypad {
+            background: #F4F4F4;
+            border: 1px solid;
+            display: none;
+            float: left;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            position: absolute;
+            width: 150px;
+        }
+        .numeric-keypad--show {
+            display: block;
+        }
+
+        .numeric-keypad__key {
+            background: #CCC;
+            border: 1px solid;
+            display: block;
+            float: left;
+            text-align: center;
+            width: 49.33px;
+        }
+        .numeric-keypad__key--double {
+            width: 98.66px;
+        }
+
+        .numeric-keypad__button {
+            border: none;
+            color: #000;
+            display: block;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            height: 49.33px;
+            line-height: 49.33px;
+            padding: 0;
+            text-decoration: none;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+<script>
+    var numPad = (function(){
+        var self;
+
+        var inputEl;
+        var numPadEl;
+
+        var keys = [7,8,9,4,5,6,1,2,3,0,',','Del','Ok','Cancel'];
+
+        var initialValue;
+
+        function init() {
+            self = this;
+
+            createKeyPad();
+
+            bindEvents();
+        }
+
+        function createKeyPad() {
+            numPadEl = document.createElement('ul');
+            numPadEl.setAttribute('id', 'numeric-keypad');
+            numPadEl.className = 'numeric-keypad';
+
+            for (var i=0; i<keys.length;i++) {
+                var numPadKeyEl = document.createElement('li');
+                numPadKeyEl.className = 'numeric-keypad__key';
+
+                if (keys[i] == 'Ok') {
+                    numPadKeyEl.classList.add('numeric-keypad__key--double');
+                }
+
+                var numPadButtonEl = document.createElement('button');
+                numPadButtonEl.setAttribute('data-key', keys[i]);
+                numPadButtonEl.className = 'numeric-keypad__button';
+
+                numPadButtonEl.innerHTML = keys[i];
+
+                numPadKeyEl.appendChild(numPadButtonEl);
+                numPadEl.appendChild(numPadKeyEl);
+            }
+
+            console.log(numPadEl);
+
+            document.body.appendChild(numPadEl);
+        }
+
+        function bindEvents() {
+            var inputEls = document.querySelectorAll('[data-num-pad]');
+
+            for (var i=0;i<inputEls.length;i++) {
+                inputEls[i].addEventListener('focus', showNumPad, false);
+            }
+
+            var keys = numPadEl.querySelectorAll('[data-key]');
+
+            for (var i=0; i<keys.length;i++) {
+                keys[i].addEventListener('click', keyPress, false);
+            }
+
+            var confirm = numPadEl.querySelectorAll('[data-key="Ok"]');
+
+            confirm[0].addEventListener('click', confirmValue, false);
+
+            var cancel = numPadEl.querySelectorAll('[data-key="Cancel"]');
+
+            cancel[0].addEventListener('click', cancelValue, false);
+        }
+
+        function showNumPad() {
+            inputEl = this;
+
+            initialValue = inputEl.value;
+
+            numPadEl.style.top = (this.offsetTop + this.offsetHeight) + 'px';
+
+            numPadEl.classList.add('numeric-keypad--show');
+        }
+
+        function hideNumPad() {
+            numPadEl.classList.remove('numeric-keypad--show');
+        }
+
+        function keyPress(e) {
+            e.preventDefault();
+
+            var key = this.getAttribute('data-key');
+
+            var currentInput = inputEl.value;
+
+            if (key == '.') {
+                if (currentInput.indexOf('.') !== -1) {
+
+                    return;
+                }
+            }
+
+            if (key == 'Del') {
+                if (inputEl.value.length) {
+                    inputEl.value = inputEl.value.substr(0,inputEl.value.length-1);
+                }
+
+                return;
+            }
+
+            var inputValue = currentInput+key;
+
+            inputEl.value = inputValue;
+
+            return;
+        }
+
+        function confirmValue(e) {
+            e.preventDefault();
+
+            hideNumPad();
+
+            confirmValueCallback(inputEl);
+        }
+
+        function confirmValueCallback(el) {
+            console.log('default confirm value callback');
+        }
+
+        function cancelValue(e) {
+            e.preventDefault();
+
+            hideNumPad();
+
+            inputEl.value = initialValue;
+
+            cancelValueCallback(inputEl);
+        }
+
+        function cancelValueCallback(e) {
+            console.log('default cancel value callback');
+        }
+
+        return {
+            init: init
+        }
+    }());
+</script>
+<input id="input" type="number" value="5.00" data-num-pad>
+
+<script src="js/numeric-keypad.js"></script>
+
+<script>
+    numPad.init();
+</script>
+</body>
+</html>

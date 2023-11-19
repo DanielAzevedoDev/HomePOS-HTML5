@@ -1,0 +1,350 @@
+<!doctype html>
+<html lang="en" data-bs-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Bootstrap demo</title>
+  <link href="./css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="./css/bootstrap-icons.css">
+  <style>
+    /* This is a single-line comment */
+    input[type='number'] {
+      -moz-appearance:textfield;
+    }
+    /* This is a single-line comment */
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+    }
+    img {
+      max-width: 128px;
+      max-height: 128px;
+    }
+  </style>
+</head>
+<body>
+<script src="./js/helper.js"></script>
+<script src="https://code.jquery.com/jquery-3.7.0.js" integrity="sha256-JlqSTELeR4TLqP0OG9dxM7yDPqX1ox/HfgiSLBj8+kM=" crossorigin="anonymous"></script>
+
+  <script>
+    products = [];
+    var prod_counter = 0;
+    function mudarPeso(event) {
+      console.log("atualizar")
+      updatePrice();
+    }
+
+    function print(item,index){
+      console.log(item);
+    }
+
+    function updatePrice(){
+      let price = parseFloat(document.getElementById('item-combo').value);
+      let peso = parseFloat(document.querySelector("#peso").value);
+      if (isNaN(price)) {
+        price = 0;
+      }
+      if(isNaN(peso)){
+        peso = 0;
+      }
+      const newVal = peso * price;
+      const payElem = document.querySelector("#pay");
+      console.log("new value "+newVal);
+      payElem.value = newVal + " €";
+    }
+    function populateProds(){
+      if(products.length === 0){
+        products=[{nome:"Coelho",preco:5.00},
+          {nome:"Frango",preco:5.00},
+          {nome:"Galinha",preco:5.50},
+          {nome:"Duzia Ovos",preco:3.00},
+          {nome:"Ovo",preco:0.25}
+        ];
+      }
+      products.forEach(print)
+    }
+
+
+    function init(){
+      populateProds();
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      init();
+    });
+
+    function limparTabela(){
+      let tbody = document.querySelector("#prodTable");
+      tbody.innerHTML = '<tr><td colspan="5">Nenhum produto Adicionado</td></tr>';
+      prod_counter = 0;
+    }
+
+    function apagarElement(event){
+      event.parentElement.parentNode.remove();
+      prod_counter--;
+      fixTableNumber();
+    }
+
+    function fixTableNumber(){
+      let tbody = document.querySelector("#prodTable");
+      let els = tbody.querySelectorAll('[scope="row"]');
+      let counter = 0;
+      els.forEach((element)=>{
+        counter++;
+        element.innerText=counter;
+      })
+    }
+
+    function adicionar(event) {
+      const name = event.getElementsByTagName('figcaption')[0].innerHTML;
+      let tbody = document.querySelector("#prodTable");
+      if(prod_counter === 0){
+        tbody.innerHTML = '';
+      }
+      prod = products.find(obj => {
+        return obj.nome === name
+      });
+      let peso = parseFloat(document.querySelector("#peso").value);
+
+      let pay = prod.preco*peso;
+      prod_counter+=1;
+      let elem_to_add = "";
+      if(prod.nome.includes("Ovo")){
+        elem_to_add = '<tr><th scope="row">'+prod_counter+'</th><td>' + name + ' </td><td>' + peso + '</td><td>' + pay +
+                ' €</td><td><button class="btn btn-danger" onclick="apagarElement(this)">' +
+                '<i class="bi bi-x-square-fill"></i></button></td></tr>';
+
+      }else{
+        elem_to_add = '<tr><th scope="row">'+prod_counter+'</th><td>' + name + ' </td><td>' + peso + ' Kg</td><td>' +
+                pay + ' €</td><td><button class="btn btn-danger" onclick="apagarElement(this)">' +
+                '<i class="bi bi-x-square-fill"></i></button></td></tr>';
+      }
+      tbody.innerHTML+=elem_to_add;
+      const payElem = document.querySelector("#pay");
+
+      payElem.value = pay + " €";
+    }
+  </script>
+
+  <div class="container">
+    <header class="d-flex flex-wrap justify-content-center py-3 mb-4 border-bottom">
+      <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto link-body-emphasis text-decoration-none">
+        <svg class="bi me-2" width="40" height="32"><use xlink:href="#bootstrap"></use></svg>
+        <span class="fs-4">Vender Coisinhas</span>
+      </a>
+    </header>
+
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#unitModal" data-bs-whatever="Ovo">Open modal for @mdo</button>
+<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#weightModal" data-bs-whatever="Frango">Open modal for @fat</button>
+<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#weightModal" data-bs-whatever="@getbootstrap">Open modal for @getbootstrap</button>
+
+    <div class="modal fade" id="unitModal" tabindex="-1" aria-labelledby="unitModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="unitModalLabel">A adicionar um </h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <form>
+              <div class="mb-3">
+                <label for="recipient-name" class="col-form-label">Produto:</label>
+                <input disabled type="text" class="form-control" id="unit-name">
+              </div>
+              <div class="mb-3">
+                <label for="code" class="col-form-label">Quantidade:</label>
+                <input class="form-control" id="amount" onkeydown="check_valid_input_key(this)">
+              </div>
+            </form>
+            <div class="btn-group-vertical col-md-12" role="group" aria-label="Basic example">
+              <div class="btn-group">
+                <button type="button" class="btn btn-outline-secondary py-3" onclick="adicionar_montante_input_modal('1')">1</button>
+                <button type="button" class="btn btn-outline-secondary py-3" onclick="adicionar_montante_input_modal('2')">2</button>
+                <button type="button" class="btn btn-outline-secondary py-3" onclick="adicionar_montante_input_modal('3')">3</button>
+              </div>
+              <div class="btn-group">
+                <button type="button" class="btn btn-outline-secondary py-3" onclick="adicionar_montante_input_modal('4')">4</button>
+                <button type="button" class="btn btn-outline-secondary py-3" onclick="adicionar_montante_input_modal('5')">5</button>
+                <button type="button" class="btn btn-outline-secondary py-3" onclick="adicionar_montante_input_modal('6')">6</button>
+              </div>
+              <div class="btn-group">
+                <button type="button" class="btn btn-outline-secondary py-3" onclick="adicionar_montante_input_modal('7')">7</button>
+                <button type="button" class="btn btn-outline-secondary py-3" onclick="adicionar_montante_input_modal('8')">8</button>
+                <button type="button" class="btn btn-outline-secondary py-3" onclick="adicionar_montante_input_modal('9')">9</button>
+              </div>
+              <div class="btn-group">
+                <button type="button" class="btn btn-danger py-3 col-md-3" onclick="document.getElementById('amount').value=document.getElementById('amount').value = 0">Apagar</button>
+                <button type="button" class="btn btn-outline-secondary py-3 col-md-3" onclick="adicionar_valor_input_modal('0')">0</button>
+                <button type="button" class="btn btn-warning py-3 col-md-3" onclick="document.getElementById('amount').value=document.getElementById('amount').value.slice(0, -1);">Apagar</button>
+              </div>
+              <div>
+                <button type="button" class="btn btn-outline-secondary py-3 col-md-12" onclick="adicionar_valor_input_modal('123')">test</button>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary">Send message</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  <div class="modal fade" id="weightModal" tabindex="-1" aria-labelledby="weightModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="weightModalLabel">A adicionar um </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form>
+            <div class="mb-3">
+              <label for="recipient-name" class="col-form-label">Produto:</label>
+              <input disabled type="text" class="form-control" id="recipient-name">
+            </div>
+            <div class="mb-3">
+              <label for="code" class="col-form-label">Peso:</label>
+              <input class="form-control" id="code">
+            </div>
+          </form>
+          <div class="btn-group-vertical col-md-12" role="group" aria-label="Basic example">
+            <div class="btn-group">
+                <button type="button" class="btn btn-outline-secondary py-3" onclick="adicionar_valor_input_modal('1')">1</button>
+                <button type="button" class="btn btn-outline-secondary py-3" onclick="adicionar_valor_input_modal('2')">2</button>
+                <button type="button" class="btn btn-outline-secondary py-3" onclick="adicionar_valor_input_modal('3')">3</button>
+            </div>
+            <div class="btn-group">
+                <button type="button" class="btn btn-outline-secondary py-3" onclick="adicionar_valor_input_modal('4')">4</button>
+                <button type="button" class="btn btn-outline-secondary py-3" onclick="adicionar_valor_input_modal('5')">5</button>
+                <button type="button" class="btn btn-outline-secondary py-3" onclick="adicionar_valor_input_modal('6')">6</button>
+            </div>
+            <div class="btn-group">
+                <button type="button" class="btn btn-outline-secondary py-3" onclick="adicionar_valor_input_modal('7')">7</button>
+                <button type="button" class="btn btn-outline-secondary py-3" onclick="adicionar_valor_input_modal('8')">8</button>
+                <button type="button" class="btn btn-outline-secondary py-3" onclick="adicionar_valor_input_modal('9')">9</button>
+            </div>
+            <div class="btn-group">
+                <button type="button" class="btn btn-outline-secondary py-3 col-md-3" onclick="adicionar_valor_input_modal(',')">,</button>
+                <button type="button" class="btn btn-outline-secondary py-3 col-md-3" onclick="adicionar_valor_input_modal('0')">0</button>
+                <button type="button" class="btn btn-warning py-3 col-md-3" onclick="document.getElementById('code').value=document.getElementById('code').value.slice(0, -1);">Apagar</button>
+            </div>
+            <div>
+              <button type="button" class="btn btn-outline-secondary py-3 col-md-12" onclick="adicionar_valor_input_modal('123')">test</button>
+            </div>
+        </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary">Send message</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    var weightModal = document.getElementById('weightModal')
+weightModal.addEventListener('show.bs.modal', function (event) {
+  // Button that triggered the modal
+  var button = event.relatedTarget
+  // Extract info from data-bs-* attributes
+  var recipient = button.getAttribute('data-bs-whatever')
+  // If necessary, you could initiate an AJAX request here
+  // and then do the updating in a callback.
+  //
+  // Update the modal's content.
+  var modalTitle = weightModal.querySelector('.modal-title')
+  var modalBodyInput = weightModal.querySelector('.modal-body input')
+
+  modalTitle.textContent = 'New message to ' + recipient
+  modalBodyInput.value = recipient
+})
+  </script>
+    <div id="main-body">
+      <div id="item-details" class="row g-3">
+        <div class="col-md-12">
+          <label for="item-combo" class="form-label">Produto</label>
+          <div id="item-combo">
+            <figure class="figure" data-bs-toggle="modal" data-bs-target="#weightModal" data-bs-whatever="Frango">
+              <img src="img/chicken.png" class="figure-img img-fluid rounded img-thumbnail" alt="A generic square placeholder image with rounded corners in a figure.">
+              <figcaption class="figure-caption">Frango</figcaption>
+            </figure>
+            <figure class="figure" onclick="adicionar(this)">
+              <img src="img/hen.png" class="figure-img img-fluid rounded img-thumbnail" alt="A generic square placeholder image with rounded corners in a figure.">
+              <figcaption class="figure-caption">Galinha</figcaption>
+            </figure>
+            <figure class="figure" onclick="adicionar(this)">
+              <img src="img/coelho.png" class="figure-img img-fluid rounded img-thumbnail" alt="A generic square placeholder image with rounded corners in a figure.">
+              <figcaption class="figure-caption">Coelho</figcaption>
+            </figure>
+            <figure class="figure" onclick="adicionar(this,12)">
+              <img src="img/eggs.png" class="figure-img img-fluid rounded img-thumbnail" alt="A generic square placeholder image with rounded corners in a figure.">
+              <figcaption class="figure-caption">Duzia Ovos</figcaption>
+            </figure>
+            <figure class="figure" onclick="adicionar(this,1)">
+              <img src="img/eggs.png" class="figure-img img-fluid rounded img-thumbnail" alt="A generic square placeholder image with rounded corners in a figure.">
+              <figcaption class="figure-caption">Ovo</figcaption>
+            </figure>
+          </div>
+          <div class="invalid-feedback">
+            Escolha um Produto.
+          </div>
+        </div>
+
+        <div class="col-md-3">
+          <label for="peso" class="form-label">Quantidade: </label>
+          <input onchange="mudarPeso(this)" type="number" class="form-control" id="peso" min="0" placeholder="3,000" required="" step=",01">
+          <div class="invalid-feedback">
+            Introduza um peso.
+          </div>
+        </div>
+
+
+
+        <div class="col-md-2">
+          <label for="pay" class="form-label">A pagar</label>
+          <input type="text" class="form-control money" id="pay" disabled value="0,00 &euro;" data-inputmask="'mask': '99,99 €'">
+        </div>
+
+        <div class="col-md-4 d-grid ">
+          <div class="col-md-6 d-flex aligns-items-center">
+            <button class="w-100 btn btn-warning btn-lg" id="limpar">Limpar</button>
+          </div>
+
+        </div>
+      </div>
+
+      <div id="sales-list" class="row g-3">
+        <table class="table table-dark table-striped">
+          <thead>
+          <tr>
+            <th scope="col">Produto</th>
+            <th scope="col">Peso</th>
+            <th scope="col">Preço</th>
+            <th scope="col"> </th>
+          </tr>
+          </thead>
+          <tbody id="prodTable">
+          <tr><td colspan="4">Nenhum produto Adicionado</td></tr>
+          </tbody>
+          <tfoot>
+          <tr>
+            <th scope="row" colspan="2">Total</th>
+            <td id="totalPay" colspan="2">0 €</td>
+          </tr>
+          </tfoot>
+        </table>
+        <div id="table_commands">
+          <div class="col-md-6">
+            <button class="w-100 btn btn-warning btn-lg" onclick="limparTabela()">Limpar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  <script>
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.7/dist/umd/popper.min.js" integrity="sha384-zYPOMqeu1DAVkHiLqWBUTcbYfZ8osu1Nd6Z89ify25QV9guujx43ITvfi12/QExE" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.min.js" integrity="sha384-Y4oOpwW3duJdCWv5ly8SCFYWqFDsfob/3GkgExXKV4idmbt98QcxXYs9UoXAB7BZ" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe" crossorigin="anonymous"></script>
+</body>
+</html>
