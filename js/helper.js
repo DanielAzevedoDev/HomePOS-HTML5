@@ -32,3 +32,5 @@ function check_valid_input_key(event){
     const VALID_CHAR = '0123456789.,';
     return VALID_CHAR.includes(key);
 }
+
+var ping = "pong";

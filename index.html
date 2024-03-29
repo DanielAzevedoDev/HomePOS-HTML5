@@ -4,6 +4,45 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Bootstrap demo</title>
+  <script type="application/javascript">
+    function adicionar_montante_input_modal(value){
+      adicionar_valor_input_modal_generic(document.getElementById("amount"),value)
+    }
+    function adicionar_valor_input_modal(value) {
+      adicionar_valor_input_modal_generic(document.getElementById("code"),value)
+    }
+    function adicionar_valor_input_modal_generic(modal_in,value) {
+      if(validate_valid_decimal(modal_in,value))
+        return;
+      modal_in.value=modal_in.value.concat(value);
+    }
+
+    function validate_valid_decimal(modal_in,value){
+      return ("."=== value || ","===value)&&modal_in.value.includes(value);
+    }
+
+    function limpar(modal_in){
+      modal_in.value='';
+    }
+
+    function apagar(modal_in){
+      if(modal_in.value.length<2){
+        limpar(modal_in)
+      }else{
+        modal_in.value.slice(0, -1);
+      }
+    }
+    const VALID_CHAR = '0123456789.,';
+    function check_valid_input_key(event){
+      let key = event.key;
+      if(validate_valid_decimal(modal_in,value)){
+        return VALID_CHAR.includes(key);
+      }
+    }
+
+    var ping = "pong";
+
+  </script>
   <link href="./css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="./css/bootstrap-icons.css">
   <style>
@@ -23,7 +62,6 @@
   </style>
 </head>
 <body>
-<script src="./js/helper.js"></script>
 <script src="https://code.jquery.com/jquery-3.7.0.js" integrity="sha256-JlqSTELeR4TLqP0OG9dxM7yDPqX1ox/HfgiSLBj8+kM=" crossorigin="anonymous"></script>
 
   <script>
@@ -95,8 +133,8 @@
       })
     }
 
-    function adicionar(event) {
-      const name = event.getElementsByTagName('figcaption')[0].innerHTML;
+    function adicionar() {
+      const name = document.getElementById('recipient-name').value;
       let tbody = document.querySelector("#prodTable");
       if(prod_counter === 0){
         tbody.innerHTML = '';
@@ -104,7 +142,13 @@
       prod = products.find(obj => {
         return obj.nome === name
       });
-      let peso = parseFloat(document.querySelector("#peso").value);
+      let pesos = document.getElementsByName("peso");
+      let peso = 0;
+      for (let pesoValue of pesos) {
+        if("" !== pesoValue.value){
+          peso = parseFloat(pesoValue.value);
+        }
+      }
 
       let pay = prod.preco*peso;
       prod_counter+=1;
@@ -123,6 +167,8 @@
       const payElem = document.querySelector("#pay");
 
       payElem.value = pay + " €";
+
+      document.querySelector("#weightModal > div > div > div.modal-footer > button.btn.btn-secondary").click();
     }
   </script>
 
@@ -132,12 +178,12 @@
         <svg class="bi me-2" width="40" height="32"><use xlink:href="#bootstrap"></use></svg>
         <span class="fs-4">Vender Coisinhas</span>
       </a>
-    </header>
+    </header><!--
 
-    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#unitModal" data-bs-whatever="Ovo">Open modal for @mdo</button>
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#unitModal" data-bs-whatever="Ovo">Cenas</button>
 <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#weightModal" data-bs-whatever="Frango">Open modal for @fat</button>
 <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#weightModal" data-bs-whatever="@getbootstrap">Open modal for @getbootstrap</button>
-
+-->
     <div class="modal fade" id="unitModal" tabindex="-1" aria-labelledby="unitModalLabel" aria-hidden="true">
       <div class="modal-dialog">
         <div class="modal-content">
@@ -152,8 +198,8 @@
                 <input disabled type="text" class="form-control" id="unit-name">
               </div>
               <div class="mb-3">
-                <label for="code" class="col-form-label">Quantidade:</label>
-                <input class="form-control" id="amount" onkeydown="check_valid_input_key(this)">
+                <label for="amount" class="col-form-label">Quantidade:</label>
+                <input name="peso" class="form-control" id="amount" onkeydown="check_valid_input_key(this)">
               </div>
             </form>
             <div class="btn-group-vertical col-md-12" role="group" aria-label="Basic example">
@@ -177,14 +223,11 @@
                 <button type="button" class="btn btn-outline-secondary py-3 col-md-3" onclick="adicionar_valor_input_modal('0')">0</button>
                 <button type="button" class="btn btn-warning py-3 col-md-3" onclick="document.getElementById('amount').value=document.getElementById('amount').value.slice(0, -1);">Apagar</button>
               </div>
-              <div>
-                <button type="button" class="btn btn-outline-secondary py-3 col-md-12" onclick="adicionar_valor_input_modal('123')">test</button>
-              </div>
             </div>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            <button type="button" class="btn btn-primary">Send message</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="limpar(document.getElementById('amount'))">Close</button>
+            <button type="button" class="btn btn-success" onclick="adicionar">Adicionar</button>
           </div>
         </div>
       </div>
@@ -204,7 +247,7 @@
             </div>
             <div class="mb-3">
               <label for="code" class="col-form-label">Peso:</label>
-              <input class="form-control" id="code">
+              <input name="peso" class="form-control" id="code">
             </div>
           </form>
           <div class="btn-group-vertical col-md-12" role="group" aria-label="Basic example">
@@ -228,14 +271,11 @@
                 <button type="button" class="btn btn-outline-secondary py-3 col-md-3" onclick="adicionar_valor_input_modal('0')">0</button>
                 <button type="button" class="btn btn-warning py-3 col-md-3" onclick="document.getElementById('code').value=document.getElementById('code').value.slice(0, -1);">Apagar</button>
             </div>
-            <div>
-              <button type="button" class="btn btn-outline-secondary py-3 col-md-12" onclick="adicionar_valor_input_modal('123')">test</button>
-            </div>
         </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-primary">Send message</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="limpar(document.getElementById('code'))">Close</button>
+          <button type="button" class="btn btn-success" onclick="adicionar()">Adicionar</button>
         </div>
       </div>
     </div>
@@ -267,11 +307,11 @@ weightModal.addEventListener('show.bs.modal', function (event) {
               <img src="img/chicken.png" class="figure-img img-fluid rounded img-thumbnail" alt="A generic square placeholder image with rounded corners in a figure.">
               <figcaption class="figure-caption">Frango</figcaption>
             </figure>
-            <figure class="figure" onclick="adicionar(this)">
+            <figure class="figure"  data-bs-toggle="modal" data-bs-target="#weightModal" data-bs-whatever="Galinha">
               <img src="img/hen.png" class="figure-img img-fluid rounded img-thumbnail" alt="A generic square placeholder image with rounded corners in a figure.">
               <figcaption class="figure-caption">Galinha</figcaption>
             </figure>
-            <figure class="figure" onclick="adicionar(this)">
+            <figure class="figure"  data-bs-toggle="modal" data-bs-target="#weightModal" data-bs-whatever="Coelho">
               <img src="img/coelho.png" class="figure-img img-fluid rounded img-thumbnail" alt="A generic square placeholder image with rounded corners in a figure.">
               <figcaption class="figure-caption">Coelho</figcaption>
             </figure>
